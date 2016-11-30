@@ -847,14 +847,16 @@ static ssize_t rgidle_state_store(struct kobject *kobj,
 	char cmd[32];
 	int param;
 
-	if (sscanf(buf, "%s %d", cmd, &param) == 2) {
-		if (!strcmp(cmd, "rgidle")) {
+	if(n < 32) {
+		if (sscanf(buf, "%s %d", cmd, &param) == 2) {
+			if (!strcmp(cmd, "rgidle")) {
+				idle_switch[IDLE_TYPE_RG] = param;
+			}
+			return n;
+		} else if (sscanf(buf, "%d", &param) == 1) {
 			idle_switch[IDLE_TYPE_RG] = param;
+			return n;
 		}
-		return n;
-	} else if (sscanf(buf, "%d", &param) == 1) {
-		idle_switch[IDLE_TYPE_RG] = param;
-		return n;
 	}
 
 	return -EINVAL;
