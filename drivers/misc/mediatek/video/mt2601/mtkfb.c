@@ -1010,7 +1010,7 @@ static int mtkfb_set_overlay_layer(struct fb_info *info, struct fb_overlay_layer
 
 	unsigned int layerpitch;
 	unsigned int layerbpp;
-	unsigned int id = layerInfo->layer_id;
+	unsigned int id = (layerInfo->layer_id >= OVL_LAYER_NUM ? 0 : layerInfo->layer_id);
 	int enable = layerInfo->layer_enable ? 1 : 0;
 	int ret = 0;
 	disp_job *job = disp_deque_job(disp_config.session_id);
@@ -1343,6 +1343,7 @@ static int mtkfb_ioctl(struct fb_info *info, unsigned int cmd, unsigned long arg
 	case MTKFB_SET_OVERLAY_LAYER:
 	{
 		struct fb_overlay_layer layerInfo;
+		memset((void*)&layerInfo, 0, sizeof(layerInfo));
 		MTKFB_INFO(" mtkfb_ioctl():MTKFB_SET_OVERLAY_LAYER\n");
 
 		if (copy_from_user(&layerInfo, (void __user *)arg, sizeof(layerInfo))) {
