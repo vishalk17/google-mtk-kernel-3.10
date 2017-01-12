@@ -348,6 +348,62 @@ out_free:
 	return ret;
 }
 
+static struct resource mt2601_resource [] = {
+	[0] = {
+		.start = 48,
+		.end = 48,
+		.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_LOWLEVEL,
+	},
+	[1] = {
+		.start = 49,
+		.end = 49,
+		.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_LOWLEVEL,
+	},
+};
+
+static struct platform_device mt2601_pdev = {
+	.name = "arm,cortex-a7-pmu",
+	.id = -1,
+	.num_resources  = ARRAY_SIZE(mt2601_resource),
+	.resource = mt2601_resource,
+};
+
+static int mt2601_cpu_pmu_device_probe(void)
+{
+	struct platform_device *pdev = &mt2601_pdev;
+	struct arm_pmu *pmu;
+	int ret = 0;
+	int cpu;
+
+	pmu = kzalloc(sizeof(struct arm_pmu), GFP_KERNEL);
+	if (!pmu) {
+		pr_info("failed to allocate PMU device!");
+		return -ENOMEM;
+	}
+
+	ret = probe_current_pmu(pmu);
+
+	if (ret) {
+		pr_info("failed to probe PMU!");
+		goto out_free;
+	}
+
+	for_each_cpu_mask(cpu, pmu->valid_cpus)
+		per_cpu(cpu_pmu, cpu) = pmu;
+
+	pmu->plat_device = pdev;
+	cpu_pmu_init(pmu);
+	ret = armpmu_register(pmu, -1);
+
+	if (!ret)
+		return 0;
+
+out_free:
+	pr_info("failed to register PMU devices!");
+	kfree(pmu);
+	return ret;
+}
+
 static struct platform_driver cpu_pmu_driver = {
 	.driver		= {
 		.name	= "arm-pmu",
@@ -377,6 +433,8 @@ static int __init register_pmu_driver(void)
 		cpu_pm_unregister_notifier(&cpu_pmu_pm_notifier);
 		unregister_cpu_notifier(&cpu_pmu_hotplug_notifier);
 	}
+
+	mt2601_cpu_pmu_device_probe();
 
 	return err;
 }

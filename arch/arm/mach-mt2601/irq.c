@@ -179,6 +179,32 @@ static int mt_irq_set_type(struct irq_data *data, unsigned int flow_type)
 	return 0;
 }
 
+#ifdef CONFIG_SMP
+static int mt_irq_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
+			    bool force)
+{
+	void __iomem *reg = GIC_DIST_BASE + GIC_DIST_TARGET + ((d->irq) & ~3);
+	unsigned int cpu, shift = ((d->irq) % 4) * 8;
+	u32 val, mask, bit;
+
+	if (!force)
+		cpu = cpumask_any_and(mask_val, cpu_online_mask);
+	else
+		cpu = cpumask_first(mask_val);
+
+	/* 2601 only support cpu 0 as the irq target */
+	mask = 0xff << shift;
+	bit = 0x1 << shift;
+
+	raw_spin_lock(&irq_lock);
+	val = readl_relaxed(reg) & ~mask;
+	writel_relaxed(val | bit, reg);
+	raw_spin_unlock(&irq_lock);
+
+	return IRQ_SET_MASK_OK;
+}
+#endif
+
 static struct irq_chip mt_irq_chip = {
 	.irq_disable = mt_irq_mask,
 	.irq_enable = mt_irq_unmask,
@@ -186,6 +212,9 @@ static struct irq_chip mt_irq_chip = {
 	.irq_mask = mt_irq_mask,
 	.irq_unmask = mt_irq_unmask,
 	.irq_set_type = mt_irq_set_type,
+#ifdef CONFIG_SMP
+	.irq_set_affinity	= mt_irq_set_affinity,
+#endif
 	.flags = IRQCHIP_SKIP_SET_WAKE
 };
 
