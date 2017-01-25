@@ -1309,7 +1309,7 @@ static void call_console_drivers(int level, const char *text, size_t len)
 		return;
 
 	for_each_console(con) {
-        if (printk_disable_uart)
+        if ((printk_disable_uart == 1) && (con->flags & CON_CONSDEV))
             continue;
 		if (exclusive_console && con != exclusive_console)
 			continue;
