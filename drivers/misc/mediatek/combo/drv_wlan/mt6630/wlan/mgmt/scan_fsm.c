@@ -1299,7 +1299,7 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter,
 	P_SCAN_PARAM_T prScanParam;
 	P_CMD_NLO_REQ prCmdNloReq;
 	UINT_32 i, j;
-
+	UINT_8	ucRetStatus = TRUE;
 	ASSERT(prAdapter);
 
 	DBGLOG(SCN, INFO, "scnFsmSchedScanRequest\n");
@@ -1425,15 +1425,15 @@ scnFsmSchedScanRequest(IN P_ADAPTER_T prAdapter,
 				nicOidCmdTimeoutCommon,
 				sizeof(CMD_NLO_REQ) + prCmdNloReq->u2IELen,
 				(PUINT_8) prCmdNloReq, NULL, 0) != WLAN_STATUS_FAILURE)
-		return TRUE;
+		ucRetStatus = TRUE;
 	else
-		return FALSE;
+		ucRetStatus = FALSE;
 #else
 	scnPSCNFsm(prAdapter, PSCN_RESET, prCmdNloReq, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE);
 #endif
 	cnmMemFree(prAdapter, (PVOID) prCmdNloReq);
 
-	return TRUE;
+	return ucRetStatus;
 }
 
 /*----------------------------------------------------------------------------*/
