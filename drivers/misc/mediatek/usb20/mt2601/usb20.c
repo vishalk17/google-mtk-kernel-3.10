@@ -183,10 +183,11 @@ static void mt_usb_enable(struct musb *musb)
 	musb->is_host = true;
     }*/
 
-    if (!mtk_usb_power) {
-	if (down_interruptible(&power_clock_lock))
-	    xlog_printk(ANDROID_LOG_ERROR, "USB20", "%s: busy, Couldn't get power_clock_lock\n" \
+    if (down_interruptible(&power_clock_lock))
+        xlog_printk(ANDROID_LOG_ERROR, "USB20", "%s: busy, Couldn't get power_clock_lock\n" \
 			, __func__);
+
+    if (!mtk_usb_power) {
 
 #ifndef FPGA_PLATFORM
 	/* enable_pll(UNIVPLL, "USB_PLL"); */
@@ -198,9 +199,11 @@ static void mt_usb_enable(struct musb *musb)
 
 	mtk_usb_power = true;
 
-	up(&power_clock_lock);
     }
-	musb->power = true;
+
+    musb->power = true;
+
+    up(&power_clock_lock);
 
     musb_writel(mtk_musb->mregs, USB_L1INTM, flags);
 }
@@ -218,11 +221,11 @@ static void mt_usb_disable(struct musb *musb)
 	platform_init_first = false;
     }*/
 
-    if (mtk_usb_power) {
-	if (down_interruptible(&power_clock_lock))
-	    xlog_printk(ANDROID_LOG_ERROR, "USB20", "%s: busy, Couldn't get power_clock_lock\n" \
+    if (down_interruptible(&power_clock_lock))
+        xlog_printk(ANDROID_LOG_ERROR, "USB20", "%s: busy, Couldn't get power_clock_lock\n" \
 			, __func__);
 
+    if (mtk_usb_power) {
 	usb_phy_savecurrent();
 
 	mtk_usb_power = false;
@@ -232,10 +235,11 @@ static void mt_usb_disable(struct musb *musb)
 	DBG(0, "disable UPLL before disconnect\n");
 #endif
 
-	up(&power_clock_lock);
     }
 
     musb->power = false;
+
+    up(&power_clock_lock);
 }
 
 /* ================================ */
