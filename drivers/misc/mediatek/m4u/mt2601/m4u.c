@@ -292,6 +292,7 @@ struct timer_list perf_timer;
 static M4U_MODULE_ID_ENUM m4u_port_2_module(const M4U_PORT_ID_ENUM portID)
 {
 	M4U_MODULE_ID_ENUM moduleID = M4U_CLNTMOD_UNKNOWN;
+
 	switch (portID)
 	{
 		case M4U_PORT_MDP_RDMA:
@@ -610,6 +611,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_T_POWER_ON, copy_from_user failed, %d\n", ret);
 				return -EFAULT;
 			}
+			if (ModuleID < 0 || ModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", ModuleID);
+				return -EFAULT;
+			}
 			ret = m4u_power_on();
 			break;
 
@@ -621,6 +626,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_T_POWER_OFF, copy_from_user failed, %d\n", ret);
 				return -EFAULT;
 			}
+			if (ModuleID < 0 || ModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", ModuleID);
+				return -EFAULT;
+			}
 			ret = m4u_power_off();
 			break;
 
@@ -630,6 +639,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_ALLOC_MVA, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
 				return -EFAULT;
 			}
 
@@ -679,6 +692,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_T_QUERY_MVA, copy_from_user failed: %d\n", ret);
 				return -EFAULT;
 			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
+				return -EFAULT;
+			}
 			M4ULOG("-MTK_M4U_T_QUERY_MVA, module_id=%d, BufAddr=0x%x, BufSize=%d \r\n",
 				   m4u_module.eModuleID, m4u_module.BufAddr, m4u_module.BufSize);
 
@@ -703,6 +720,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_DEALLOC_MVA, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
 				return -EFAULT;
 			}
 			M4ULOG("MTK_M4U_T_DEALLOC_MVA, eModuleID:%d, VABuf:0x%x, Length:%d, MVAStart=0x%x \r\n",
@@ -750,6 +771,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_Manual_Insert_Entry, copy_from_user failed: %d\n", ret);
 				return -EFAULT;
 			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
+				return -EFAULT;
+			}
 			M4ULOG(" ManualInsertTLBEntry, eModuleID:%d, Entry_MVA:0x%x, locked:%d\r\n",
 				   m4u_module.eModuleID, m4u_module.EntryMVA, m4u_module.Lock);
 
@@ -767,6 +792,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR("m4u_insert_seq_range , copy_from_user failed: %d\n", ret);
 				return -EFAULT;
 			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
+				return -EFAULT;
+			}
 
 			ret = m4u_insert_seq_range(m4u_module.eModuleID,
 									   m4u_module.MVAStart,
@@ -780,6 +809,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_Invalid_TLB_Range, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
 				return -EFAULT;
 			}
 			M4ULOG("MTK_M4U_Invalid_TLB_Range(), eModuleID:%d, MVAStart=0x%x, MVAEnd=0x%x\n",
@@ -798,6 +831,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_Invalid_TLB_Range, copy_from_user failed, %d\n", ret);
 				return -EFAULT;
 			}
+			if (ModuleID < 0 || ModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", ModuleID);
+				return -EFAULT;
+			}
 			/* ret = m4u_invalid_tlb_all(); */
 			break;
 
@@ -807,6 +844,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_Invalid_TLB_Range, copy_from_user failed, %d\n", ret);
+				return -EFAULT;
+			}
+			if (ModuleID < 0 || ModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", ModuleID);
 				return -EFAULT;
 			}
 			m4u_dump_main_tlb_tags();
@@ -822,6 +863,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_Invalid_TLB_Range, copy_from_user failed, %d\n", ret);
 				return -EFAULT;
 			}
+			if (ModuleID < 0 || ModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", ModuleID);
+				return -EFAULT;
+			}
 			ret = m4u_dump_info();
 			m4u_dump_pagetable(ModuleID);
 
@@ -833,6 +878,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_CACHE_INVALID_AFTER_HW_WRITE_MEM, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_cache_data.eModuleID < 0 || m4u_cache_data.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_cache_data.eModuleID);
 				return -EFAULT;
 			}
 			M4ULOG("MTK_M4U_T_CACHE_INVALID_AFTER_HW_WRITE_MEM(), moduleID=%d, eCacheSync=%d, buf_addr=0x%x, buf_length=0x%x\n",
@@ -865,6 +914,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_T_CONFIG_PORT, copy_from_user failed: %d\n", ret);
 				return -EFAULT;
 			}
+			if (m4u_port.ePortID < 0 || m4u_port.ePortID >= M4U_PORT_NUM) {
+				M4UMSG("from user port id is invald,%d\n", m4u_port.ePortID);
+				return -EFAULT;
+			}
 			M4ULOG("ePortID=%d, Virtuality=%d, Security=%d, Distance=%d, Direction=%d\n",
 				   m4u_port.ePortID, m4u_port.Virtuality, m4u_port.Security, m4u_port.Distance, m4u_port.Direction);
 
@@ -877,6 +930,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_CONFIG_PORT_ROTATOR, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_port_rotator.ePortID < 0 || m4u_port_rotator.ePortID >= M4U_PORT_NUM) {
+				M4UMSG("from user port id is invald,%d\n", m4u_port_rotator.ePortID);
 				return -EFAULT;
 			}
 			ret = m4u_config_port_rotator(&m4u_port_rotator);
@@ -892,6 +949,14 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_INSERT_WRAP_RANGE, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_wrap_range.ePortID < 0 || m4u_wrap_range.ePortID >= M4U_PORT_NUM) {
+				M4UMSG("from user port id is invald,%d\n", m4u_wrap_range.ePortID);
+				return -EFAULT;
+			}
+			if (m4u_wrap_range.eModuleID < 0 || m4u_wrap_range.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_wrap_range.eModuleID);
 				return -EFAULT;
 			}
 			M4ULOG("PortID=%d, eModuleID=%d, MVAStart=0x%x, MVAEnd=0x%x\n",
@@ -914,6 +979,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_T_MONITOR_START, copy_from_user failed, %d\n", ret);
 				return -EFAULT;
 			}
+			if (PortID < 0 || PortID >= M4U_PORT_NUM) {
+				M4UMSG("from user port id is invald,%d\n", PortID);
+				return -EFAULT;
+			}
 			ret = m4u_monitor_start();
 
 			break;
@@ -926,6 +995,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				M4UERR(" MTK_M4U_T_MONITOR_STOP, copy_from_user failed, %d\n", ret);
 				return -EFAULT;
 			}
+			if (PortID < 0 || PortID >= M4U_PORT_NUM) {
+				M4UMSG("from user port id is invald,%d\n", PortID);
+				return -EFAULT;
+			}
 			ret = m4u_monitor_stop();
 			break;
 
@@ -935,6 +1008,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_RESET_MVA_RELEASE_TLB, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (ModuleID < 0 || ModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", ModuleID);
 				return -EFAULT;
 			}
 			ret = m4u_reset_mva_release_tlb(ModuleID);
@@ -963,6 +1040,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 				if (ret)
 				{
 					M4UERR(" MTK_M4U_T_ALLOC_MVA, copy_from_user failed: %d\n", ret);
+					return -EFAULT;
+				}
+				if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+					M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
 					return -EFAULT;
 				}
 				mva = m4u_module.MVAStart;
@@ -1011,6 +1092,10 @@ static long MTK_M4U_ioctl(struct file *a_pstFile,
 			if (ret)
 			{
 				M4UERR(" MTK_M4U_T_ALLOC_MVA, copy_from_user failed: %d\n", ret);
+				return -EFAULT;
+			}
+			if (m4u_module.eModuleID < 0 || m4u_module.eModuleID >= M4U_CLNTMOD_UNKNOWN) {
+				M4UMSG("from user module id is invald,%d\n", m4u_module.eModuleID);
 				return -EFAULT;
 			}
 			M4ULOG("-MTK_M4U_T_REGISTER_BUF, module_id=%d, BufAddr=0x%x, BufSize=%d \r\n",
